@@ -8,11 +8,9 @@ beepbeep_monolith.egg-info/top_level.txt
 monolith/__init__.py
 monolith/app.py
 monolith/auth.py
-monolith/background.py
 monolith/database.py
 monolith/form_custom_models.py
 monolith/forms.py
-monolith/mail_service.py
 monolith/views/__init__.py
 monolith/views/auth.py
 monolith/views/errors.py

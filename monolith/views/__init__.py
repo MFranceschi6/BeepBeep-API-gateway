@@ -7,7 +7,6 @@ from .training_objectives import training_objectives
 from .user_challenge import user_challenge
 from .statistics import statistics
 from .profile import profile
-from .test import test
 
 
 blueprints = [home,
@@ -19,5 +18,4 @@ blueprints = [home,
               user_challenge,
               statistics,
               profile,
-              test
               ]

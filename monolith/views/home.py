@@ -8,12 +8,12 @@ home = Blueprint('home', __name__)
 
 
 def _strava_auth_url(config):
-    client = Client()
-    client_id = config['STRAVA_CLIENT_ID']
-    redirect = 'http://127.0.0.1:5000/strava_auth'
-    url = client.authorization_url(client_id=client_id,
-                                   redirect_uri=redirect)
-    return url
+    # client = Client()
+    # client_id = config['STRAVA_CLIENT_ID']
+    # redirect = 'http://127.0.0.1:5000/strava_auth'
+    # url = client.authorization_url(client_id=client_id,
+    #                                redirect_uri=redirect)
+    return ""
 
 
 @home.route('/')
