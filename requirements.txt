@@ -1,0 +1,9 @@
+matplotlib
+flask
+flask-login
+celery
+redis
+flask-wtf
+flask-sqlalchemy
+stravalib==0.9.4
+sqlalchemy_utils
