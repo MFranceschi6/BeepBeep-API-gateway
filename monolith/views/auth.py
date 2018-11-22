@@ -34,8 +34,8 @@ def login():
         user = q.first()
         if user is not None and user.authenticate(password):
             login_user(user)
-            return redirect('/fetch')
-    return render_template('login.html', form=form)
+            return redirect('/')
+    return render_template('login.html', form = form)
 
 
 @auth.route("/logout")
