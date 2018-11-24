@@ -11,6 +11,7 @@ monolith/auth.py
 monolith/database.py
 monolith/form_custom_models.py
 monolith/forms.py
+monolith/request_utils.py
 monolith/views/__init__.py
 monolith/views/auth.py
 monolith/views/errors.py
@@ -19,7 +20,6 @@ monolith/views/profile.py
 monolith/views/runs.py
 monolith/views/statistics.py
 monolith/views/strava.py
-monolith/views/test.py
 monolith/views/training_objectives.py
 monolith/views/user_challenge.py
 monolith/views/users.py
