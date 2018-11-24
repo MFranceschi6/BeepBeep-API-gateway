@@ -10,6 +10,8 @@ def create_app():
     app = Flask(__name__)
     app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
     app.config['SECRET_KEY'] = 'ANOTHER ONE'
+    app.config['STRAVA_CLIENT_ID'] = os.environ['STRAVA_CLIENT_ID']
+    app.config['STRAVA_CLIENT_SECRET'] = os.environ['STRAVA_CLIENT_SECRET']
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///beepbeep-apigateway.db'
 
     for bp in blueprints:
