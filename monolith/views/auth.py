@@ -55,9 +55,3 @@ def logout():
     logout_user()
     return redirect('/')
 
-
-def strava_deauth(user):
-    pass
-    # if user.strava_token is not None:
-    #     client = Client(user.strava_token)
-    #     client.deauthorize()
