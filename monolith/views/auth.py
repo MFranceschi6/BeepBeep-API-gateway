@@ -23,9 +23,11 @@ def _strava_auth():
 
     try:
         user_id = current_user.id
-        params = {'id' : user_id,
-                  'strava_token' : strava_token}
-        r = put_request_retry(users_endpoint(), user_id, body = params)
+        params = {
+            'id': user_id,
+            'strava_token': strava_token
+        }
+        r = put_request_retry(users_endpoint(), user_id, body=params)
         code = r.status_code
         if code == 204:
             return redirect(url_for('home.index'))
@@ -47,11 +49,10 @@ def login():
         if user is not None and user.authenticate(password):
             login_user(user)
             return redirect('/')
-    return render_template('login.html', form = form)
+    return render_template('login.html', form=form)
 
 
 @auth.route("/logout")
 def logout():
     logout_user()
     return redirect('/')
-

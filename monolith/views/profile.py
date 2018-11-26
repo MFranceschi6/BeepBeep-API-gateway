@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, abort
+from flask import Blueprint, render_template, request, abort
 from monolith.database import db
 from monolith.auth import current_user, login_required
 from monolith.forms import ProfileForm
-from monolith.request_utils import users_endpoint, get_request_retry, put_request_retry
+from monolith.request_utils import (users_endpoint, get_request_retry,
+                                    put_request_retry)
 import requests
 import enum
 
@@ -11,8 +12,8 @@ profile = Blueprint('profile', __name__)
 
 
 class ReportPeriodicity(enum.Enum):
-    no     = 'No'
-    daily  = 'Daily'
+    no = 'No'
+    daily = 'Daily'
     weekly = 'Weekly'
     montly = 'Montly'
 
@@ -41,14 +42,6 @@ def _profile():
     form.password.render_kw = {'placeholder': 'YOUR OLD PASSWORD'}
 
     if request.method == 'POST' and form.validate_on_submit():
-        tmp_password = current_user.password
-        new_password = form.password.data
-        # form.populate_obj(current_user)
-        # current_user.report_periodicity = form.periodicity.data
-        if new_password:
-            current_user.set_password(new_password)
-        db.session.commit()
-
         new_data = get_modified_data(form)
         if new_data is not {}:
             try:
@@ -63,6 +56,11 @@ def _profile():
                 print(err)
                 return abort(503)
 
+        new_password = form.password.data
+        if new_password:
+            current_user.set_password(new_password)
+            db.session.commit()
+
     try:
         r = get_request_retry(users_endpoint(), user_id)
 
@@ -70,17 +68,17 @@ def _profile():
         if code == 200:
 
             user = r.json()
-            form.email.data     = user['email']
+            form.email.data = user['email']
             form.firstname.data = user['firstname']
-            form.lastname.data  = user['lastname']
-            form.age.data       = user['age']
-            form.weight.data    = user['weight']
-            form.max_hr.data    = user['max_hr']
-            form.rest_hr.data   = user['rest_hr']
-            form.vo2max.data    = user['vo2max']
+            form.lastname.data = user['lastname']
+            form.age.data = user['age']
+            form.weight.data = user['weight']
+            form.max_hr.data = user['max_hr']
+            form.rest_hr.data = user['rest_hr']
+            form.vo2max.data = user['vo2max']
             # form.periodicity.data = current_user.report_periodicity.name
 
-            return render_template("profile.html", form = form)
+            return render_template("profile.html", form=form)
 
     except requests.exceptions.RequestException as err:
         print(err)

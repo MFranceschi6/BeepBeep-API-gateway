@@ -2,7 +2,6 @@ from flask import Blueprint, redirect, render_template, request, url_for, abort
 from monolith.forms import UserForm, RemoveUserForm
 from monolith.database import db, User
 from monolith.auth import current_user, login_required
-from monolith.views.auth import strava_deauth
 from monolith.request_utils import users_endpoint, post_request_retry, delete_request_retry
 import requests
 
@@ -37,7 +36,6 @@ def try_delete_user(user):
         if code == 204:
             db.session.delete(user)
             db.session.commit()
-            strava_deauth(user)
             return redirect(url_for('home.index'))
         else:
             return abort(400)
