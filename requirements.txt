@@ -1,9 +1,7 @@
-matplotlib
+pyjwt
 flask
 flask-login
-celery
-redis
 flask-wtf
-flask-sqlalchemy
+flask_sqlalchemy
 stravalib==0.9.4
-sqlalchemy_utils
+chaussette
