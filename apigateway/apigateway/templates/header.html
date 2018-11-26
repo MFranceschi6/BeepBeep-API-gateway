@@ -1,0 +1,22 @@
+<head>
+  <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+  <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+</head>
+<body>
+  <ul class="navbar">
+    <li><img src="{{url_for('static', filename='nav_logo.png')}}" class="logo" /></li>
+    <li><a href="{{url_for('home.index')}}">Home</a></li>
+    
+    {% if current_user.is_authenticated %}
+      <li class="float-right"><a href="{{url_for('auth.logout')}}">Logout</a></li>
+      <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>
+      <li class="float-right"><a href="{{url_for('profile._profile')}}">Hi {{current_user.email}} </a></li>
+    {% else %}
+      <li class="float-right"><a href="{{url_for('users.create_user')}}">Register</a></li>
+      <li class="float-right"><a href="{{url_for('auth.login')}}">Login</a></li>
+    {% endif %}
+  
+  </ul>
+  <section>
+    <div class="bodyContainer">
+      <div class="bodyContent">
