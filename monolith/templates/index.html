@@ -5,11 +5,11 @@
     {% if current_user.is_authenticated %}
 
       {% if average_speed >= 0 %}
-        <h2 class="textJeansDark text-center">Average speed of your last 10 runs</h2>
+        <h2 class="textJeansDark text-center">Average speed of your runs</h2>
         <h3 class="textPumpkingDark text-center">{{average_speed}} m/s</h3>
       {% endif %}
 
-      <h2 class="textJeansDark text-center">Your Runs</h2>
+      <h2 class="textJeansDark text-center">Your last 10 Runs</h2>
       <table>
         <thead>
           <tr>
