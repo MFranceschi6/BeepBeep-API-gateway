@@ -4,9 +4,9 @@
   <div class="content">
     {% if current_user.is_authenticated %}
 
-      {% if total_average_speed %}
-        <h2 class="textJeansDark text-center">Average speed of all your run</h2>
-        <h3 class="textPumpkingDark text-center">{{total_average_speed}} m/s</h3>
+      {% if average_speed >= 0 %}
+        <h2 class="textJeansDark text-center">Average speed of your last 10 runs</h2>
+        <h3 class="textPumpkingDark text-center">{{average_speed}} m/s</h3>
       {% endif %}
 
       <h2 class="textJeansDark text-center">Your Runs</h2>
