@@ -7,32 +7,32 @@ from wtforms.fields.html5 import EmailField
 
 
 class LoginForm(FlaskForm):
-    email    = EmailField('Email', validators=[DataRequired(),
-                                               Email()])
+    email = EmailField('Email', validators=[DataRequired(),
+                                            Email()])
     password = f.PasswordField('Password', validators=[DataRequired()])
-    
-    display  = ['email',
-                'password']
+
+    display = ['email',
+               'password']
 
 
 class RemoveUserForm(FlaskForm):
     password = f.PasswordField('Password', validators=[DataRequired()])
-    
-    display  = ['password']
+
+    display = ['password']
 
 
 class UserForm(FlaskForm):
-    email     = EmailField('Email', validators=[DataRequired(),
-                                                Email(),
-                                                UniqueMailValidator()])
-    firstname = f.StringField('Firstname',       validators=[DataRequired()])
-    lastname  = f.StringField('Lastname',        validators=[DataRequired()])
-    password  = f.PasswordField('Password',      validators=[DataRequired()])
-    age       = f.IntegerField('Age',            validators=[DataRequired()])
-    weight    = f.FloatField('Weight',           validators=[DataRequired()])
-    max_hr    = f.IntegerField('Max Heartrate',  validators=[DataRequired()])
-    rest_hr   = f.IntegerField('Rest Heartrate', validators=[DataRequired()])
-    vo2max    = f.FloatField('VO2 Max',          validators=[DataRequired()])
+    email = EmailField('Email', validators=[DataRequired(),
+                                            Email(),
+                                            UniqueMailValidator()])
+    firstname = f.StringField('Firstname', validators=[DataRequired()])
+    lastname = f.StringField('Lastname', validators=[DataRequired()])
+    password = f.PasswordField('Password', validators=[DataRequired()])
+    age = f.IntegerField('Age', validators=[DataRequired()])
+    weight = f.FloatField('Weight', validators=[DataRequired()])
+    max_hr = f.IntegerField('Max Heartrate', validators=[DataRequired()])
+    rest_hr = f.IntegerField('Rest Heartrate', validators=[DataRequired()])
+    vo2max = f.FloatField('VO2 Max', validators=[DataRequired()])
 
     display = ['email',
                'firstname',
@@ -46,45 +46,58 @@ class UserForm(FlaskForm):
 
 
 class ProfileForm(UserForm):
-  email       = EmailField('Email', validators=[DataRequired(),
-                                                Email()])
-  firstname   = f.StringField('Firstname',       validators=[DataRequired()])
-  lastname    = f.StringField('Lastname',        validators=[DataRequired()])
-  password    = f.PasswordField('Password',      validators=[])
-  age         = f.IntegerField('Age',            validators=[DataRequired()])
-  weight      = f.FloatField('Weight',           validators=[DataRequired()])
-  max_hr      = f.IntegerField('Max Heartrate',  validators=[DataRequired()])
-  rest_hr     = f.IntegerField('Rest Heartrate', validators=[DataRequired()])
-  vo2max      = f.FloatField('VO2 Max',          validators=[DataRequired()])
-  periodicity = f.SelectField('Report Periodicity')
-  
-  display = ['email',
-             'firstname',
-             'lastname',
-             'password',
-             'age',
-             'weight',
-             'max_hr',
-             'rest_hr',
-             'vo2max',
-             'periodicity']
+    email = EmailField('Email', validators=[DataRequired(),
+                                            Email()])
+    firstname = f.StringField('Firstname', validators=[DataRequired()])
+    lastname = f.StringField('Lastname', validators=[DataRequired()])
+    password = f.PasswordField('Password', validators=[])
+    age = f.IntegerField('Age', validators=[DataRequired()])
+    weight = f.FloatField('Weight', validators=[DataRequired()])
+    max_hr = f.IntegerField('Max Heartrate', validators=[DataRequired()])
+    rest_hr = f.IntegerField('Rest Heartrate', validators=[DataRequired()])
+    vo2max = f.FloatField('VO2 Max', validators=[DataRequired()])
+    periodicity = f.SelectField('Report Periodicity')
 
-   
+    display = ['email',
+               'firstname',
+               'lastname',
+               'password',
+               'age',
+               'weight',
+               'max_hr',
+               'rest_hr',
+               'vo2max',
+               'periodicity']
+
+
 class TrainingObjectiveSetterForm(FlaskForm):
-    start_date = f.DateField('Start date',
-                             validators=[DataRequired(message='Not a valid date'), 
+
+    dateNotValid = 'Not a valid date'
+    endNotValid = 'Cannot be before Start Date'
+    kmNotValid = 'You need to run at least a meter'
+
+    def kmFilter(value):
+        if value is not None:
+            return float('%.3f' % float(value))
+        else:
+            return value
+
+    start_date = f.DateField('Start Date',
+                             validators=[DataRequired(message=dateNotValid),
                                          fc.NotLessThenToday()],
-                             widget=f.widgets.Input(input_type="date"))
-    end_date = f.DateField('End date',
-                           validators=[DataRequired(message='Not a valid date'),
-                                       fc.NotLessThan('start_date', message='Cannot be before Start date'),
+                             widget=f.widgets.Input(input_type='date'))
+    end_date = f.DateField('End Date',
+                           validators=[DataRequired(message=dateNotValid),
+                                       fc.NotLessThan('start_date',
+                                                      message=endNotValid),
                                        fc.NotLessThenToday()],
-                           widget=f.widgets.Input(input_type="date"))
-    kilometers_to_run = f.FloatField('Kilometers to run',
-                                     validators=[DataRequired('You need at least a meter to run'),
-                                                 NumberRange(min=0.001, message='You need at least a meter to run')],
-                                     widget=fc.FloatInput(step='any', min_='0'),
-                                     filters=[lambda value: float('%.3f' % float(value)) if value is not None else value])
+                           widget=f.widgets.Input(input_type='date'))
+    km_to_run = f.FloatField('Km to run',
+                             validators=[DataRequired(kmNotValid),
+                                         NumberRange(min=0.001,
+                                         message=kmNotValid)],
+                             widget=fc.FloatInput(step='any', min_='0'),
+                             filters=[kmFilter])
 
     display = ['start_date',
                'end_date',
@@ -92,18 +105,16 @@ class TrainingObjectiveSetterForm(FlaskForm):
 
 
 class TrainingObjectiveVisualizerForm(FlaskForm):
-    start_date  = f.DateField('Start')
-    end_date    = f.DateField('End')
-    kilometers_to_run   = f.FloatField('Km to Run')
+    start_date = f.DateField('Start Date')
+    end_date = f.DateField('End Date')
+    km_to_run = f.FloatField('Km to Run')
     traveled_kilometers = f.FloatField('Traveled Km')
-    status              = f.StringField('Status')
-    description         = f.StringField('Description')
+    status = f.StringField('Status')
+    description = f.StringField('Description')
 
     display = ['start_date',
                'end_date',
                'kilometers_to_run',
-               'traveled_kilometers', 
+               'traveled_kilometers',
                'status',
                'description']
-
-        

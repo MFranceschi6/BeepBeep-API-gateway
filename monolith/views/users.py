@@ -45,12 +45,6 @@ def try_delete_user(user):
         return abort(503)
 
 
-@users.route('/users')
-def _users():
-    users = db.session.query(User)
-    return render_template("users.html", users=users)
-
-
 @users.route('/create_user', methods=['GET', 'POST'])
 def create_user():
     form = UserForm()

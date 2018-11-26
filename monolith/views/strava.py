@@ -1,6 +1,5 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, redirect
 from monolith.auth import strava_token_required, login_required
-from flask_login import current_user
 
 strava = Blueprint('strava', __name__)
 

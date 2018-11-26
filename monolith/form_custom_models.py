@@ -1,8 +1,8 @@
-import wtforms as f
 import wtforms.widgets.core as wtcore
 from wtforms.validators import ValidationError
-import datetime
 from monolith.database import db, User
+from datetime import datetime
+
 
 class NotLessThan(object):
     """
@@ -15,25 +15,18 @@ class NotLessThan(object):
         interpolated with `%(other_label)s` and `%(other_name)s` to provide a
         more helpful error.
     """
-    def __init__(self, fieldname, message=None):
-        self.fieldname = fieldname
+    def __init__(self, other, message=None):
+        self.other = other
         self.message = message
 
     def __call__(self, form, field):
-        try:
-            other = form[self.fieldname]
-        except KeyError:
-            raise ValidationError(field.gettext("Invalid field name '%s'.") % self.fieldname)
-        if field.data < other.data:
-            d = {
-                'other_label': hasattr(other, 'label') and other.label.text or self.fieldname,
-                'other_name': self.fieldname
-            }
+        if field.data < self.other.data:
             message = self.message
             if message is None:
-                message = field.gettext('Field must not be less than %(other_name)s')
+                message = field.gettext('Cannot be less than {}' %
+                                        self.other.label.text)
 
-            raise ValidationError(message % d)
+            raise ValidationError(message)
 
 
 class NotLessThenToday(object):
@@ -47,11 +40,11 @@ class NotLessThenToday(object):
         self.message = message
 
     def __call__(self, form, field):
-        today = datetime.datetime.now().date()
+        today = datetime.now().date()
         if field.data < today:
             message = self.message
             if self.message is None:
-                message = field.gettext('Field must not be less than today')
+                message = field.gettext('Cannot be less than today')
 
             raise ValidationError(message)
 
@@ -90,7 +83,8 @@ class UniqueMailValidator(object):
         self.message = message
 
     def __call__(self, form, field):
-        if db.session.query(User).filter(User.email == field.data).first() is not None:
+        user = db.session.query(User).filter(User.email == field.data).first()
+        if user is not None:
             message = self.message
             if self.message is None:
                 message = field.gettext('This email has already been used')

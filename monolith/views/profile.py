@@ -46,12 +46,6 @@ def _profile():
         if new_data is not {}:
             try:
                 r = put_request_retry(users_endpoint(), user_id, new_data)
-
-                code = r.status_code
-                if code == 400:
-                    return abort(code)
-                elif code == 404:
-                    return abort(code)
             except requests.exceptions.RequestException as err:
                 print(err)
                 return abort(503)
@@ -62,7 +56,7 @@ def _profile():
             db.session.commit()
 
     try:
-        r = get_request_retry(users_endpoint(), user_id)
+        r = get_request_retry(users_endpoint(), 0)
 
         code = r.status_code
         if code == 200:

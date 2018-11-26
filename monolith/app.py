@@ -1,5 +1,5 @@
 import os
-from flask import Flask, url_for
+from flask import Flask
 from monolith.database import db, User
 from monolith.views import blueprints
 from monolith.auth import login_manager
