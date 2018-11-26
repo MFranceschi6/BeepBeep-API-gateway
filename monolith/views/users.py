@@ -2,7 +2,8 @@ from flask import Blueprint, redirect, render_template, request, url_for, abort
 from monolith.forms import UserForm, RemoveUserForm
 from monolith.database import db, User
 from monolith.auth import current_user, login_required
-from monolith.request_utils import users_endpoint, post_request_retry, delete_request_retry
+from monolith.request_utils import (users_endpoint, post_request_retry,
+                                    delete_request_retry)
 import requests
 
 
@@ -18,7 +19,7 @@ def abort_create_user(new_user, error_code):
 
 def try_create_user(new_user, params):
     try:
-        r = post_request_retry(users_endpoint(), params = params)
+        r = post_request_retry(users_endpoint(), params=params)
         code = r.status_code
         if code == 204:
             return redirect(url_for('home.index'))
@@ -63,19 +64,18 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
 
-            params = {"id":        new_user.get_id(),
-                      "email":     new_user.get_email(),
+            params = {"id": new_user.get_id(),
+                      "email": new_user.get_email(),
                       "firstname": form.firstname.data,
-                      "lastname":  form.lastname.data,
-                      "age":       form.age.data,
-                      "weight":    form.weight.data,
-                      "max_hr":    form.max_hr.data,
-                      "rest_hr":   form.rest_hr.data,
-                      "vo2max":    form.vo2max.data
-                    }
+                      "lastname": form.lastname.data,
+                      "age": form.age.data,
+                      "weight": form.weight.data,
+                      "max_hr": form.max_hr.data,
+                      "rest_hr": form.rest_hr.data,
+                      "vo2max": form.vo2max.data}
             return try_create_user(new_user, params)
 
-    return render_template('create_user.html', form = form)
+    return render_template('create_user.html', form=form)
 
 
 @users.route('/remove_user', methods=['GET', 'POST'])
@@ -84,9 +84,9 @@ def remove_user():
     form = RemoveUserForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user_id  = current_user.id
+            user_id = current_user.id
             password = form.data['password']
-            
+
             user = db.session.query(User).filter(User.id == user_id).first()
             if user is not None and user.authenticate(password):
                 return try_delete_user(user)

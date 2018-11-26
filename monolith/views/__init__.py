@@ -1,5 +1,5 @@
 from .home import home
-from .auth import auth as _auth  # need to have monolith.auth visible or when we try to import it we get the blueprint
+from .auth import auth as _auth
 from .users import users
 # from .strava import strava
 from .runs import runs

@@ -59,6 +59,8 @@ def index():
             print(err)
             return abort(503)
 
+    print(average_speed)
+
     return render_template('index.html',
                            strava_auth_url=strava_auth_url,
                            average_speed=average_speed)
