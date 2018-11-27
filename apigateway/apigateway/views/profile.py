@@ -47,6 +47,9 @@ def _profile():
         if new_data is not {}:
             try:
                 r = put_request_retry(users_endpoint(), user_id, new_data)
+                code = r.status_code
+                if code != 204:
+                    return abort(code)
             except requests.exceptions.RequestException as err:
                 print(err)
                 return abort(503)
@@ -74,6 +77,8 @@ def _profile():
             # form.periodicity.data = current_user.report_periodicity.name
 
             return render_template("profile.html", form=form)
+        else:
+            return abort(code)
 
     except requests.exceptions.RequestException as err:
         print(err)

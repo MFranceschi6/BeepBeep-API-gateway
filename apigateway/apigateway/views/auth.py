@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, redirect, request, abort, url_for
-from flask_login import (current_user, login_user, logout_user,
-                         login_required)
+from flask_login import current_user, login_user, logout_user, login_required
 from stravalib import Client
 from apigateway.apigateway.database import db, User
 from apigateway.apigateway.forms import LoginForm
-from apigateway.apigateway.request_utils import users_endpoint, put_request_retry
+from apigateway.apigateway.request_utils import (users_endpoint,
+                                                 put_request_retry)
 import requests
 
 

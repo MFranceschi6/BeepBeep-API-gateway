@@ -20,8 +20,9 @@ def _strava_auth_url(config):
 @home.route('/')
 def index():
 
-    average_speed = None
     strava_auth_url = _strava_auth_url(home.app.config)
+    average_speed = None
+    runs = None
 
     if current_user is not None and hasattr(current_user, 'id'):
 
@@ -51,16 +52,15 @@ def index():
             r = get_request_retry(runs_endpoint(user_id), params=params)
             code = r.status_code
             if code == 200:
-                result = r.json()
-                print(result)
+                runs = r.json()
+                print(runs)
             else:
                 return abort(code)
         except requests.exceptions.RequestException as err:
             print(err)
             return abort(503)
 
-    print(average_speed)
-
     return render_template('index.html',
                            strava_auth_url=strava_auth_url,
-                           average_speed=average_speed)
+                           average_speed=average_speed,
+                           runs=runs)

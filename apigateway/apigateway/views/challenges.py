@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, abort
+from flask import Blueprint, render_template, request, abort, redirect, url_for
 from apigateway.apigateway.auth import current_user, login_required
 from apigateway.apigateway.request_utils import (challenges_endpoint,
-                                                 get_request_retry)
+                                                 get_request_retry,
+                                                 post_request_retry)
 import requests
 
 
@@ -21,7 +22,30 @@ challenges = Blueprint('challenges', __name__)
 #     return None
 
 
-@challenges.route('/challenges', methods=['GET', 'POST'])
+@challenges.route('/challenges/<id>', methods=['GET'])
+@login_required
+def create_challenge(id):
+
+    try:
+
+        user_id = current_user.id
+
+        params = {'run_challenged_id': id}
+        r = post_request_retry(challenges_endpoint(user_id), params=params)
+
+        code = r.status_code
+        if code == 204:
+            return redirect(url_for('challenges.'))
+        elif code == 404:
+            return abort(code)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        return abort(503)
+
+    return abort(400)
+
+
+@challenges.route('/challenges', methods=['GET'])
 @login_required
 def _challenges():
 

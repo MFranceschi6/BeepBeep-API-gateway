@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, render_template, request, url_for, abort
+from flask_login import login_user
 from apigateway.apigateway.forms import UserForm, RemoveUserForm
 from apigateway.apigateway.database import db, User
 from apigateway.apigateway.auth import current_user, login_required
@@ -12,7 +13,6 @@ users = Blueprint('users', __name__)
 
 
 def abort_create_user(new_user, error_code):
-    print("Abort create user: remove user from database")
     db.session.delete(new_user)
     db.session.commit()
     return abort(error_code)
@@ -23,9 +23,10 @@ def try_create_user(new_user, params):
         r = post_request_retry(users_endpoint(), params=params)
         code = r.status_code
         if code == 204:
+            login_user(new_user)
             return redirect(url_for('home.index'))
         else:
-            return abort_create_user(new_user, 400)
+            return abort_create_user(new_user, code)
     except requests.exceptions.RequestException as err:
         print(err)
         return abort_create_user(new_user, 503)
@@ -40,7 +41,7 @@ def try_delete_user(user):
             db.session.commit()
             return redirect(url_for('home.index'))
         else:
-            return abort(400)
+            return abort(code)
     except requests.exceptions.RequestException as err:
         print(err)
         return abort(503)

@@ -1,5 +1,5 @@
 pyjwt
--e git+https://github.com/Albertomac/flakon.git#egg=flakon
+-e git+https://github.com/MFranceschi6/flakon.git#egg=flakon
 flask
 flask-login
 flask-wtf

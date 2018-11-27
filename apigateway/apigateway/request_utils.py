@@ -1,8 +1,22 @@
+import os
 import configparser
 import requests
 import functools
 import time
 import json
+
+
+DEBUG = True
+
+
+def timing(f):
+    def wrap(*args, **kargs):
+        start = time.time()
+        ret = f(*args, **kargs)
+        end = time.time()
+        print('{:s} took {:.3f}ms'.format(f.__name__, (end - start) * 1000.0))
+        return ret
+    return wrap if DEBUG else f
 
 
 CONFIG = {
@@ -22,8 +36,9 @@ CONFIG = {
 def load_configuration():
     global CONFIG
     if CONFIG['LOADED'] is False:
+        config = os.path.join(os.path.dirname(__file__), 'microservices.ini')
         parser = configparser.ConfigParser()
-        parser.read('microservices.ini')
+        parser.read(config)
 
         p = parser['MICROSERVICES']
         CONFIG['LOADED'] = True
@@ -36,6 +51,18 @@ def load_configuration():
         CONFIG['OBJECTIVES_ENDPOINT'] = p['OBJECTIVES_ENDPOINT']
         CONFIG['STATISTICS_SERVICE'] = p['STATISTICS_SERVICE']
         CONFIG['STATISTICS_ENDPOINT'] = p['STATISTICS_ENDPOINT']
+
+        if 'DATA_SERVICE' in os.environ:
+            CONFIG['DATA_SERVICE'] = os.environ['DATA_SERVICE']
+
+        if 'CHALLENGES_SERVICE' in os.environ:
+            CONFIG['CHALLENGES_SERVICE'] = os.environ['CHALLENGES_SERVICE']
+
+        if 'OBJECTIVES_SERVICE' in os.environ:
+            CONFIG['OBJECTIVES_SERVICE'] = os.environ['OBJECTIVES_SERVICE']
+
+        if 'STATISTICS_SERVICE' in os.environ:
+            CONFIG['STATISTICS_SERVICE'] = os.environ['STATISTICS_SERVICE']
 
 
 def add_resource(endpoint=None, resource=None):
@@ -190,21 +217,25 @@ def put_request(url, resource=None, body=None):
     return r
 
 
+@timing
 @retry_request
 def get_request_retry(url, resource=None, params=None):
     return get_request(url, resource, params)
 
 
+@timing
 @retry_request
 def post_request_retry(url, resource=None, params=None):
     return post_request(url, resource, params)
 
 
+@timing
 @retry_request
 def delete_request_retry(url, resource=None):
     return delete_request(url, resource)
 
 
+@timing
 @retry_request
 def put_request_retry(url, resource=None, body=None):
     return put_request(url, resource, body)
