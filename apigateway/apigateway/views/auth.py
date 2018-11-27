@@ -30,6 +30,8 @@ def _strava_auth():
         r = put_request_retry(users_endpoint(), user_id, body=params)
         code = r.status_code
         if code == 204:
+            current_user.set_strava_authorized()
+            db.session.commit()
             return redirect(url_for('home.index'))
         else:
             return abort(400)
