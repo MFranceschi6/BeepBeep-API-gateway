@@ -14,6 +14,7 @@ class User(db.Model):
     password = db.Column(db.Unicode(128))
     is_active = db.Column(db.Boolean, default=True)
     is_admin = db.Column(db.Boolean, default=False)
+    is_strava_authorized = db.Column(db.Boolean, default=False)
 
     def __init__(self, *args, **kw):
         super(User, self).__init__(*args, **kw)
@@ -30,7 +31,6 @@ class User(db.Model):
         return self._authenticated
 
     def authenticate(self, password):
-        print(password, " ", self.password)
         checked = check_password_hash(self.password, password)
         self._authenticated = checked
         return self._authenticated
@@ -40,6 +40,10 @@ class User(db.Model):
 
     def get_email(self):
         return self.email
+
+    def set_strava_authorized(self):
+        self.is_strava_authorized = True
+
 
 def init_database():
     exists = db.session.query(User).filter(User.email == 'example@example.com')
