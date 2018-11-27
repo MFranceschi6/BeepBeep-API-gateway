@@ -16,7 +16,7 @@ class ReportPeriodicity(enum.Enum):
     no = 'No'
     daily = 'Daily'
     weekly = 'Weekly'
-    montly = 'Montly'
+    monthly = 'Monthly'
 
 
 def get_modified_data(form):
@@ -30,6 +30,7 @@ def get_modified_data(form):
     data['max_hr'] = form.max_hr.data
     data['rest_hr'] = form.rest_hr.data
     data['vo2max'] = form.vo2max.data
+    data['report_periodicity'] = form.periodicity.data
     return data
 
 
@@ -74,7 +75,7 @@ def _profile():
             form.max_hr.data = user['max_hr']
             form.rest_hr.data = user['rest_hr']
             form.vo2max.data = user['vo2max']
-            # form.periodicity.data = current_user.report_periodicity.name
+            form.periodicity.data = user['report_periodicity']
 
             return render_template("profile.html", form=form)
         else:
