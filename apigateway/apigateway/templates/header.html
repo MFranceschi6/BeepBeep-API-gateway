@@ -9,7 +9,9 @@
     
     {% if current_user.is_authenticated %}
       <li class="float-right"><a href="{{url_for('auth.logout')}}">Logout</a></li>
-      <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>
+      {% if not current_user.is_strava_authorized %}
+        <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>
+      {% endif %}
       <li class="float-right"><a href="{{url_for('profile._profile')}}">Hi {{current_user.email}} </a></li>
     {% else %}
       <li class="float-right"><a href="{{url_for('users.create_user')}}">Register</a></li>
