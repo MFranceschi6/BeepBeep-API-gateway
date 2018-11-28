@@ -47,13 +47,11 @@ def index():
                 'page': 0,
                 "per_page": 10
             }
-            print(runs_endpoint(user_id))
 
             r = get_request_retry(runs_endpoint(user_id), params=params)
             code = r.status_code
             if code == 200:
                 runs = r.json()
-                print(runs)
             else:
                 return abort(code)
         except requests.exceptions.RequestException as err:

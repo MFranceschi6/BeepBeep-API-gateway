@@ -76,7 +76,7 @@
             <tbody>
               {% for run in runs %}
                 <tr>
-                  <td>
+                  <td class="text-center">
                     <a href="{{url_for('challenges.challenge_complete', id=id, challenger_id=run['id'])}}">
                       <img class="icon" src="{{url_for('static', filename='challenge.png')}}"/>
                     </a>
