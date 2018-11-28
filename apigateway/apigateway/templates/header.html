@@ -11,6 +11,8 @@
       <li class="float-right"><a href="{{url_for('auth.logout')}}">Logout</a></li>
       {% if not current_user.is_strava_authorized %}
         <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>
+      {% else %}
+        <li class="float-right"><a href="{{url_for('strava.fetch_new_runs')}}">Fetch new Runs</a></li>
       {% endif %}
       <li class="float-right"><a href="{{url_for('profile._profile')}}">Hi {{current_user.email}} </a></li>
     {% else %}
