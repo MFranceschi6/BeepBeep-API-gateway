@@ -7,3 +7,4 @@ flask_sqlalchemy
 stravalib==0.9.4
 chaussette
 celery
+redis
