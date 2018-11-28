@@ -8,6 +8,7 @@
     <li><a href="{{url_for('home.index')}}">Home</a></li>
     
     {% if current_user.is_authenticated %}
+      <li><a href="{{url_for('challenges._challenges')}}">Challenges</a></li>
       <li class="float-right"><a href="{{url_for('auth.logout')}}">Logout</a></li>
       {% if not current_user.is_strava_authorized %}
         <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>

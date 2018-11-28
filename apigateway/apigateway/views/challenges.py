@@ -1,42 +1,55 @@
-from flask import Blueprint, render_template, request, abort, redirect, url_for
+from flask import Blueprint, render_template, abort, redirect, url_for
 from apigateway.apigateway.auth import current_user, login_required
-from apigateway.apigateway.request_utils import (challenges_endpoint,
-                                                 get_request_retry,
-                                                 post_request_retry)
+from flakon.request_utils import (runs_endpoint, challenges_endpoint,
+                                  get_request_retry, post_request_retry,
+                                  put_request_retry)
 import requests
+from datetime import datetime
 
 
 challenges = Blueprint('challenges', __name__)
 
-# def get_run(user_id, run_id):
 
-#     try:
-#         r = get_request(runs_endpoint(user_id), run_id)
-#         code = r.status_code
-#         if code == 200:
-#             return r.json()
+def get_run(run_id):
+    if run_id is not None:
+        user_id = current_user.id
+        try:
+            r = get_request_retry(runs_endpoint(user_id), run_id)
+            code = r.status_code
+            if code == 200:
+                result = r.json()
+                start_date = datetime.fromtimestamp(result['start_date'])
+                result['start_date'] = start_date.strftime('%d/%m/%y at %H:%M')
+                return result
 
-#     except requests.exceptions.RequestException as err:
-#             print(err)
-#             return abort(503)
-#     return None
+        except requests.exceptions.RequestException as err:
+                print(err)
+    return None
+
+
+def get_run_name(run_id):
+
+    run = get_run(run_id)
+    if run is not None:
+        return run['title']
+    return ""
 
 
 @challenges.route('/challenges/<id>', methods=['GET'])
 @login_required
-def create_challenge(id):
+def challenge_create(id):
 
     try:
-
         user_id = current_user.id
-
-        params = {'run_challenged_id': id}
+        params = {'run_challenged_id': int(id)}
         r = post_request_retry(challenges_endpoint(user_id), params=params)
 
         code = r.status_code
-        if code == 204:
-            return redirect(url_for('challenges.'))
-        elif code == 404:
+        if code == 200:
+            result = r.json()
+            challenge_id = result
+            return redirect(url_for('challenges.challenge', id=challenge_id))
+        else:
             return abort(code)
     except requests.exceptions.RequestException as err:
         print(err)
@@ -49,81 +62,113 @@ def create_challenge(id):
 @login_required
 def _challenges():
 
-    user_id = current_user.id
+    try:
+        user_id = current_user.id
+        r = get_request_retry(challenges_endpoint(user_id))
 
-    if request.method == 'GET':
+        code = r.status_code
+        if code == 200:
+            results = r.json()
 
-        try:
-            r = get_request_retry(challenges_endpoint(user_id))
+            for r in results:
 
-            code = r.status_code
-            if code == 200:
-                results = r.json()
-                print(results)
-                return render_template("challenges.html",
-                                       results=results,
-                                       challenge_id=None)
-            elif code == 404:
-                return abort(code)
-        except requests.exceptions.RequestException as err:
-            print(err)
-            return abort(503)
+                run_challenged_id = r['run_challenged_id']
+                run_challenger_id = r['run_challenger_id']
+                start_date = datetime.fromtimestamp(r['start_date'])
+                r['start_date'] = start_date.strftime('%d/%m/%y at %H:%M')
+
+                r['run_challenged_name'] = get_run_name(run_challenged_id)
+                r['run_challenger_name'] = get_run_name(run_challenger_id)
+
+            return render_template("challenges.html",
+                                   results=results,
+                                   challenge_id=None)
+        else:
+            abort(code)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        return abort(503)
 
     return abort(400)
 
-    # if request.method == 'POST':
-    #     id_run = request.form['id_run']
-    #     current_run = db.session.query(Run).filter(Run.id == id_run).first()
-    #     if current_run is not None:
-    #         new_challenge = Challenge()
-    #         new_challenge.challenged = current_run
-    #         new_challenge.start_date = datetime.datetime.utcnow()
-    #         new_challenge.runner = current_user
-    #         db.session.add(new_challenge)
-    #         db.session.commit()
-    #         runs = db.session.query(Run).filter(Run.runner_id == new_challenge.runner_id).\
-    #                         filter(Run.start_date > new_challenge.start_date)
-    #         return render_template("challenges.html", challenge_id=new_challenge.id, runs=runs, run_challenged=current_run, run_challenger=None)
-    # return redirect(url_for('home.index'))
+
+@challenges.route('/challenge/<id>', methods=['GET'])
+@login_required
+def challenge(id):
+
+    try:
+        user_id = current_user.id
+        r = get_request_retry(challenges_endpoint(user_id), id)
+
+        code = r.status_code
+        if code == 200:
+
+            challenged_run = None
+            challenger_run = None
+            runs = None
+            won = False
+
+            result = r.json()
+
+            run_challenged_id = result['run_challenged_id']
+            run_challenger_id = result['run_challenger_id']
+            won = result['result']
+
+            challenged_run = get_run(run_challenged_id)
+            challenger_run = get_run(run_challenger_id)
+
+            if run_challenger_id is None:
+                start_date = datetime.fromtimestamp(result['start_date'])
+                start_date_param = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                params = {
+                    'start-date': start_date_param
+                }
+                try:
+                    r = get_request_retry(runs_endpoint(user_id),
+                                          params=params)
+
+                    code = r.status_code
+                    if code == 200:
+                        runs = r.json()
+                    else:
+                        return abort(code)
+                except requests.exceptions.RequestException as err:
+                    print(err)
+                    return abort(503)
+
+            return render_template("challenge.html",
+                                   id=id,
+                                   challenged_run=challenged_run,
+                                   challenger_run=challenger_run,
+                                   runs=runs,
+                                   won=won)
+        else:
+            abort(code)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        return abort(503)
+
+    return abort(400)
 
 
-# @user_challenge.route('/challenges/<id_challenge>')
-# @login_required
-# def _create_challenge(challenge_id):
-#     current_challenge = db.session.query(Challenge).filter(Challenge.id == id_challenge).first()
-#     try:
-#         run_challenged = db.session.query(Run).filter(Run.id == current_challenge.run_challenged_id).first()
-#     except AttributeError as e:
-#         return redirect(url_for('home.index'))
-#     if current_challenge.run_challenger_id is None:
-#         runs = db.session.query(Run).filter(Run.runner_id == current_challenge.runner_id).\
-#                         filter(Run.start_date > current_challenge.start_date)
-#         return render_template("challenges.html", challenge_id=current_challenge.id, runs=runs, run_challenged=run_challenged, run_challenger=None)
-#     else:
-#         run_challenger = db.session.query(Run).filter(Run.id == current_challenge.run_challenger_id).first()
-#         return render_template("challenges.html", challenge_id=current_challenge.id, run_challenged=run_challenged, run_challenger=run_challenger)
+@challenges.route('/challenges/<id>/complete/<challenger_id>',
+                  methods=['GET'])
+@login_required
+def challenge_complete(id, challenger_id):
 
-# @user_challenge.route('/terminate_challenge', methods=['GET','POST'])
-# @login_required
-# def terminate_challenge():
-#     if request.method == 'POST':
-#         id_challenger = request.form['id_challenger']
-#         id_challenge = request.form['id_challenge']
-#         current_challenge = db.session.query(Challenge).filter(Challenge.id == id_challenge).first()
-#         current_run = db.session.query(Run).filter(Run.id == id_challenger).first()
-#         if current_run is not None and current_challenge is not None:
-#             if current_run.start_date > current_challenge.start_date:
-#                 current_challenge.challenger = current_run
-#                 current_challenge.result = determine_result(current_challenge, current_run)
-#                 db.session.commit()
-#                 return redirect(url_for('user_challenge.complete_challenge', id_challenge=id_challenge))
-#     return redirect('/create_challenge')
+    try:
+        user_id = current_user.id
+        body = {
+            'run_challenger_id': int(challenger_id)
+        }
+        r = put_request_retry(challenges_endpoint(user_id), id, body=body)
 
-# def determine_result(current_challenge, current_run):
-#     challenged_run = db.session.query(Run).filter(Run.id == current_challenge.run_challenged_id).first()
-#     if challenged_run.distance == current_run.distance:
-#         return challenged_run.average_speed < current_run.average_speed
-#     elif challenged_run.distance < current_run.distance:
-#         return challenged_run.average_speed <= current_run.average_speed
-#     else:
-#         return False
+        code = r.status_code
+        if code == 200:
+            return redirect(url_for('challenges.challenge', id=id))
+        else:
+            return abort(code)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        return abort(503)
+    return abort(400)

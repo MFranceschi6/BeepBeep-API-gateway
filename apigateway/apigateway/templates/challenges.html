@@ -19,10 +19,10 @@
           <tr>
 
             {% for result in results %}
-              <td>{{ result['run_challenged_id'] }}</td>
-              <td>{{ result['run_challenger_id'] }}</td>
+              <td>{{ result['run_challenged_name'] }}</td>
+              <td>{{ result['run_challenger_name'] }}</td>
             
-            <td>{{ datetime.fromtimestamp(result['start_date']).strftime('%d/%m/%y at %H:%M') }}</td>
+            <td>{{ result['start_date'] }}</td>
             
             <td class="text-center">
             {% if result['result'] %}
@@ -31,6 +31,13 @@
               <img class="icon" src="{{url_for('static', filename='cross.png')}}">
             {% endif %}
             </td>
+
+            <td class="text-center">
+              <a href="{{url_for('challenges.challenge', id=result['id'])}}"">
+                <img class="icon" src="{{url_for('static', filename='view.png')}}"/>
+              </a>
+            </td> 
+
           </tr>
           {% endfor %}
         </tbody>
