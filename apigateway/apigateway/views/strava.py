@@ -19,13 +19,8 @@ celery_app = Celery(__name__, backend=BACKEND, broker=BROKER)
 def fetch_new_runs():
     user_id = current_user.id
     result = celery_app.send_task('datapump.datapump.fetch_runs_for_user',
-                                  user_id=user_id)
+                                  args=[user_id],
+                                  queue="fetch")
 
     result.wait()
     return redirect('/')
-    # res = fetch_runs_for_user.delay(current_user.id)
-    # res.wait()
-    # print(request.referrer)
-    # if request.referrer is not None and 'login' not in request.referrer:
-    #     return redirect(request.referrer)
-    # return redirect('/')

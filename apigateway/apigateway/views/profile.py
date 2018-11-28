@@ -13,10 +13,10 @@ profile = Blueprint('profile', __name__)
 
 
 class ReportPeriodicity(enum.Enum):
-    no = 'No'
-    daily = 'Daily'
-    weekly = 'Weekly'
-    monthly = 'Monthly'
+    No = 'No'
+    Daily = 'Daily'
+    Weekly = 'Weekly'
+    Monthly = 'Monthly'
 
 
 def get_modified_data(form):
