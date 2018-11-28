@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, abort
 from stravalib import Client
 from apigateway.apigateway.auth import current_user
-from apigateway.apigateway.request_utils import (users_endpoint, runs_endpoint,
-                                                 get_request_retry)
+from flakon.request_utils import (users_endpoint, runs_endpoint,
+                                  get_request_retry)
 import requests
 
 home = Blueprint('home', __name__)

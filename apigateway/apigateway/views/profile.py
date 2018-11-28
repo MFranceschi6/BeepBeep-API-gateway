@@ -2,9 +2,8 @@ from flask import Blueprint, render_template, request, abort
 from apigateway.apigateway.database import db
 from apigateway.apigateway.auth import current_user, login_required
 from apigateway.apigateway.forms import ProfileForm
-from apigateway.apigateway.request_utils import (users_endpoint,
-                                                 get_request_retry,
-                                                 put_request_retry)
+from flakon.request_utils import (users_endpoint, get_request_retry,
+                                  put_request_retry)
 import requests
 import enum
 

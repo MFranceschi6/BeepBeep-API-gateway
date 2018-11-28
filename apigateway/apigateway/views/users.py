@@ -3,9 +3,8 @@ from flask_login import login_user
 from apigateway.apigateway.forms import UserForm, RemoveUserForm
 from apigateway.apigateway.database import db, User
 from apigateway.apigateway.auth import current_user, login_required
-from apigateway.apigateway.request_utils import (users_endpoint,
-                                                 post_request_retry,
-                                                 delete_request_retry)
+from flakon.request_utils import (users_endpoint, post_request_retry,
+                                  delete_request_retry)
 import requests
 
 

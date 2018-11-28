@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, abort
 from apigateway.apigateway.auth import current_user, login_required
-from apigateway.apigateway.request_utils import (runs_endpoint,
-                                                 get_request_retry)
+from flakon.request_utils import runs_endpoint, get_request_retry
 from datetime import datetime
 import requests
 
