@@ -1,7 +1,8 @@
 import functools
+from flask import redirect, g
 from flask_login import current_user, LoginManager
 from apigateway.apigateway.database import User
-from flask import redirect, g
+
 
 login_manager = LoginManager()
 
@@ -31,6 +32,15 @@ def login_required(func):
             return func(*args, **kw)
         return redirect('/')
     return _login_required
+
+
+def strava_token_required(func):
+    @functools.wraps(func)
+    def _strava_token_required(*args, **kw):
+        if current_user is not None and current_user.is_strava_authorized:
+            return func(*args, **kw)
+        return redirect('/')
+    return _strava_token_required
 
 
 def after_this_request(func):
