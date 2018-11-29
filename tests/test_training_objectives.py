@@ -8,6 +8,9 @@ _FORMS = 'apigateway.apigateway.forms'
 
 @patch(_TOS + '.current_user')
 def test_get(current_user_mock, client, db_instance):
+    """"
+    Testing GET /training_objectives
+    """""
     current_user_mock.id = 1234567890
 
     #RequestException captured
@@ -50,6 +53,9 @@ def test_get(current_user_mock, client, db_instance):
 @patch(_TOS + '.current_user')
 @patch(_TOS + '.TrainingObjectiveSetterForm')
 def test_post(current_user_mock, setter_form_class_mock, client, db_instance):
+    """"
+    Testing POST /training_objectives
+    """""
     current_user_mock.id = 1234567890
 
     setter_form = setter_form_class_mock.return_value
