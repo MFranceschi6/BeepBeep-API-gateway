@@ -29,7 +29,6 @@
             {% endfor %}
           </tr>
         </tbody>
-
       </table>
       <p class="text-center">
           <button class="buttonSlim buttonJeans" type=submit>Create</button>
@@ -37,7 +36,7 @@
       </p>
     </form>
 
-    {% if list_of_tos_count > 0 %}
+    {% if training_objectives_list|length > 0 %}
       <h1 class="text-center textPumpkingDark">Training Objectives</h1>
       <table>
         <thead>
@@ -48,31 +47,31 @@
           </tr>
         </thead>
         <tbody>
-          {% for to in list_of_tos %}
+          {% for to in training_objectives_list %}
           <tr>
-            <td class="text-center">{{ to[0] }}</td>
-            <td class="text-center">{{ to[1] }}</td>
-            <td class="text-center">{{ to[2] }}</td>
-            <td class="text-center">{{ to[3] }}</td>
+            <td class="text-center">{{ to['start_date'] }}</td>
+            <td class="text-center">{{ to['end_date'] }}</td>
+            <td class="text-center">{{ to['kilometers_to_run'] }}</td>
+            <td class="text-center">{{ to['travelled_kilometers'] }}</td>
             <!--completed-->
-            {% if to[3] >= to[2] %}
+            {% if to['travelled_kilometers'] >= to['kilometers_to_run'] %}
               <td class="text-center">>
                 <img class="icon" src="{{url_for('static', filename='check.png')}}"/>
               </td>
               <td>Wow! You are done!</td>
             {% else %}
               <!--active-->
-              {% if to[5] == 0 %}
+              {% if to['is_expired'] == false %}
                 <td class="text-center">
                   <img class="icon" src="{{url_for('static', filename='circle.png')}}"/>
                 </td>
-                <td>You can do it! Just {{ to[4] }} km!</td>
+                <td>You can do it! Just {{ to['km_left'] }} km!</td>
               <!--failed-->
               {% else %}
                 <td class="text-center">
                   <img class="icon" src="{{url_for('static', filename='cross.png')}}"/>
                 </td>
-                <td>You missed your goal by {{ to[4] }} km...</td>
+                <td>You missed your goal by {{ to['km_left'] }} km...</td>
               {% endif %}
             {% endif %}
           </tr>

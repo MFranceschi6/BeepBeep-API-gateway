@@ -1,80 +1,93 @@
-from flask import Blueprint, render_template, request
-from apigateway.database import db, Training_Objective
-from apigateway.auth import login_required
-from apigateway.forms import (TrainingObjectiveSetterForm,
-                              TrainingObjectiveVisualizerForm)
+from flask import Blueprint, render_template, request, abort
 from flask_login import current_user
-from sqlalchemy.sql import text
+from apigateway.apigateway.auth import login_required
+from apigateway.apigateway.forms import (TrainingObjectiveSetterForm,
+                                         TrainingObjectiveVisualizerForm)
+from flakon.request_utils import (objectives_endpoint, get_request_retry,
+                                  post_request_retry)
+import requests
+from datetime import datetime, timezone
 
 
 training_objectives = Blueprint('training_objectives', __name__)
 
 
+def timestamp_to_date(timestamp):
+    date = datetime.utcfromtimestamp(timestamp)
+    return date.strftime('%d/%m/%y')
+
+
+def timestamp_to_utc(timestamp):
+    return datetime.utcfromtimestamp(timestamp)
+
+
+def date_to_utc_timestamp(date):
+    date_time = datetime(year=date.year,
+                         month=date.month,
+                         day=date.day)
+    return date_time.replace(tzinfo=timezone.utc).timestamp()
+    # return (date - datetime(1970, 1, 1)) / timedelta(seconds=1)
+
+
 @training_objectives.route('/training_objectives', methods=['GET', 'POST'])
 @login_required
 def _training_objectives():
+
+    user_id = current_user.id
     setter_form = TrainingObjectiveSetterForm()
     visualizer_form = TrainingObjectiveVisualizerForm()
 
-    list_of_tos = None
+    results = None
 
     if request.method == 'POST':
         if setter_form.validate_on_submit():
-            new_objective = Training_Objective()
-            setter_form.populate_obj(new_objective)
-            new_objective.runner_id = current_user.id
-            db.session.add(new_objective)
-            db.session.commit()
 
-    sql_text = text("""
-    SELECT
-        START_DATE,
-        END_DATE,
-        ROUND(KILOMETERS_TO_RUN, 3),
-        ROUND(TRAVELED_KILOMETERS, 3),
-        ROUND(KILOMETERS_LEFT, 3),
-        IS_EXPIRED
-    FROM
-    (
-        -------------------------------------------------
-        SELECT T.START_DATE, T.END_DATE, T.KILOMETERS_TO_RUN, (SUM(R.DISTANCE)/1000.0) AS TRAVELED_KILOMETERS, (T.KILOMETERS_TO_RUN - (SUM(R.DISTANCE)/1000.0)) AS KILOMETERS_LEFT, (T.END_DATE < DATE('NOW')) AS IS_EXPIRED
-        FROM TRAINING_OBJECTIVE T, RUN R
+            start_date = date_to_utc_timestamp(setter_form.start_date.data)
+            end_date = date_to_utc_timestamp(setter_form.end_date.data)
+            km_to_run = setter_form.km_to_run.data
 
-        WHERE R.RUNNER_ID = {}
-        AND
-        T.RUNNER_ID = R.RUNNER_ID
-        AND
-        DATE(R.START_DATE) BETWEEN T.START_DATE AND T.END_DATE
+            params = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'kilometers_to_run': km_to_run
+            }
 
-        GROUP BY T.ID
-        -------------------------------------------------
-    
-            UNION ALL
-        
-        -------------------------------------------------    
-        SELECT T.START_DATE, T.END_DATE, T.KILOMETERS_TO_RUN, 0, T.KILOMETERS_TO_RUN, T.END_DATE < DATE('NOW')
-        FROM TRAINING_OBJECTIVE T
+            print(params)
 
-        WHERE T.ID IN
-        (
-            SELECT T.ID
-            FROM TRAINING_OBJECTIVE T LEFT JOIN RUN R ON
-            (T.RUNNER_ID = R.RUNNER_ID AND DATE(R.START_DATE) BETWEEN T.START_DATE AND T.END_DATE)
-            
-            WHERE T.RUNNER_ID = {}
-            
-            GROUP BY T.ID
-            HAVING COUNT(R.ID)=0
-        )
-        -------------------------------------------------
-        
-    )
-   
-    ORDER BY START_DATE, END_DATE
-    
-    """.format(current_user.id,current_user.id))
-    list_of_tos = db.engine.execute(sql_text)
+            try:
+                r = post_request_retry(objectives_endpoint(user_id),
+                                       params=params)
+                code = r.status_code
+                if code != 201:
+                    return abort(code)
+            except requests.exceptions.RequestException as err:
+                print(err)
+                return abort(503)
 
-    list_of_tos_count = db.session.query(Training_Objective).filter(Training_Objective.runner_id == current_user.id).count()
+    try:
+        r = get_request_retry(objectives_endpoint(user_id))
 
-    return render_template("training_objectives.html",list_of_tos=list_of_tos,setter_form=setter_form,visualizer_form=visualizer_form,list_of_tos_count=list_of_tos_count)
+        code = r.status_code
+        if code == 200:
+            results = r.json()
+
+            now_utc = datetime.utcnow()
+
+            for result in results:
+                end_date_utc = timestamp_to_utc(result['end_date'])
+                result['is_expired'] = end_date_utc < now_utc
+                result['start_date'] = timestamp_to_date(result['start_date'])
+                result['end_date'] = timestamp_to_date(result['end_date'])
+                km_to_run = result['kilometers_to_run']
+                travelled_kilometers = result['travelled_kilometers']
+                result['km_left'] = km_to_run - travelled_kilometers
+        else:
+            return abort(code)
+    except requests.exceptions.RequestException as err:
+        print(err)
+        return abort(503)
+
+    return render_template("training_objectives.html",
+                           training_objectives_list=results,
+                           setter_form=setter_form,
+                           visualizer_form=visualizer_form)
