@@ -45,7 +45,7 @@ class User(db.Model):
         self.is_strava_authorized = True
 
 
-def init_database():
+def init_database():  # pragma: no cover
     exists = db.session.query(User).filter(User.email == 'example@example.com')
     if exists.all() != []:
         return

@@ -31,33 +31,7 @@ def create_app(settings=None):  # pragma: no cover
     return app
 
 
-def create_testing_app():
-
-    settings = _SETTINGS
-    template_folder = os.path.join(_HERE, 'templates')
-    static_folder = os.path.join(_HERE, 'static')
-    app = _create_app(blueprints=blueprints,
-                      settings=settings,
-                      template_folder=template_folder,
-                      static_folder=static_folder)
-
-    app.config['WTF_CSRF_SECRET_KEY'] = 'A SECRET KEY'
-    app.config['SECRET_KEY'] = 'ANOTHER ONE'
-    app.config['WTF_CSRF_ENABLED'] = False
-    app.config['STRAVA_CLIENT_ID'] = os.environ['STRAVA_CLIENT_ID']
-    app.config['STRAVA_CLIENT_SECRET'] = os.environ['STRAVA_CLIENT_SECRET']
-    app.config['TESTING'] = True
-
-    for bp in blueprints:
-        app.register_blueprint(bp)
-        bp.app = app
-
-    login_manager.init_app(app)
-
-    return app
-
-
-def _400(desc):
+def _400(desc):  # pragma: no cover
     exc = HTTPException()
     exc.code = 400
     exc.description = desc

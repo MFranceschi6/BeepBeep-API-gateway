@@ -1,8 +1,8 @@
-import os
 from apigateway.apigateway.database import db
 import pytest
 from unittest.mock import patch
 import functools
+import os
 
 DB_PATH = '/tmp/apigateway.apigateway_test.db'
 DB_URI = 'sqlite:////tmp/apigateway.apigateway_test.db'
@@ -21,6 +21,7 @@ def app():
     from apigateway.apigateway.app import create_app
     app = create_app()
     app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 
     yield app
@@ -48,6 +49,8 @@ def db_instance(app):
 
     with app.app_context():
         yield db
+    os.unlink('/tmp/apigateway.apigateway_test.db')
+
 
 
 @pytest.fixture
@@ -57,6 +60,7 @@ def db_instance_login_required(app_login_required):
 
     with app_login_required.app_context():
         yield db
+    os.unlink('/tmp/apigateway.apigateway_test.db')
 
 
 @pytest.fixture
