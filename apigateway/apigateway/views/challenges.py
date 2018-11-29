@@ -10,6 +10,16 @@ from datetime import datetime
 challenges = Blueprint('challenges', __name__)
 
 
+def timestamp_to_date(timestamp):
+    date = datetime.fromtimestamp(timestamp)
+    return date.strftime('%d/%m/%y at %H:%M')
+
+
+def timestamp_to_param(timestamp):
+    date = datetime.fromtimestamp(timestamp)
+    return date.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
 def get_run(run_id):
     if run_id is not None:
         user_id = current_user.id
@@ -18,8 +28,7 @@ def get_run(run_id):
             code = r.status_code
             if code == 200:
                 result = r.json()
-                start_date = datetime.fromtimestamp(result['start_date'])
-                result['start_date'] = start_date.strftime('%d/%m/%y at %H:%M')
+                result['start_date'] = timestamp_to_date(result['start_date'])
                 return result
 
         except requests.exceptions.RequestException as err:
@@ -71,12 +80,9 @@ def _challenges():
             results = r.json()
 
             for r in results:
-
+                r['start_date'] = timestamp_to_date(r['start_date'])
                 run_challenged_id = r['run_challenged_id']
                 run_challenger_id = r['run_challenger_id']
-                start_date = datetime.fromtimestamp(r['start_date'])
-                r['start_date'] = start_date.strftime('%d/%m/%y at %H:%M')
-
                 r['run_challenged_name'] = get_run_name(run_challenged_id)
                 r['run_challenger_name'] = get_run_name(run_challenger_id)
 
@@ -118,8 +124,7 @@ def challenge(id):
             challenger_run = get_run(run_challenger_id)
 
             if run_challenger_id is None:
-                start_date = datetime.fromtimestamp(result['start_date'])
-                start_date_param = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+                start_date_param = timestamp_to_param(result['start_date'])
                 params = {
                     'start-date': start_date_param
                 }
@@ -130,6 +135,10 @@ def challenge(id):
                     code = r.status_code
                     if code == 200:
                         runs = r.json()
+
+                        for run in runs:
+                            date = run['start_date']
+                            run['start_date'] = timestamp_to_date(date)
                     else:
                         return abort(code)
                 except requests.exceptions.RequestException as err:
