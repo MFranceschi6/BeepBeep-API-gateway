@@ -20,11 +20,12 @@ class NotLessThan(object):
         self.message = message
 
     def __call__(self, form, field):
-        if field.data < self.other.data:
+        other_field = form[self.other]
+        if field.data < other_field.data:
             message = self.message
             if message is None:
                 message = field.gettext('Cannot be less than {}' %
-                                        self.other.label.text)
+                                        other_field.label.text)
 
             raise ValidationError(message)
 

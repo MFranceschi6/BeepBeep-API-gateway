@@ -101,7 +101,7 @@ class TrainingObjectiveSetterForm(FlaskForm):
 
     display = ['start_date',
                'end_date',
-               'kilometers_to_run']
+               'km_to_run']
 
 
 class TrainingObjectiveVisualizerForm(FlaskForm):
@@ -114,7 +114,7 @@ class TrainingObjectiveVisualizerForm(FlaskForm):
 
     display = ['start_date',
                'end_date',
-               'kilometers_to_run',
+               'km_to_run',
                'traveled_kilometers',
                'status',
                'description']
