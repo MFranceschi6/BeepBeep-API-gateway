@@ -27,6 +27,7 @@ def app_login_required():
     from apigateway.apigateway.app import create_app
     app = create_app()
     app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/apigateway.apigateway_test.db'
 
     yield app

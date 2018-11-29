@@ -1,5 +1,5 @@
 from .home import home as homeView
-from .auth import auth as _authView
+from .auth import auth as authView
 from .users import users as usersView
 from .strava import strava as stravaView
 from .runs import runs as runsView
@@ -10,7 +10,7 @@ from .profile import profile as profileView
 
 
 blueprints = [homeView,
-              _authView,
+              authView,
               usersView,
               stravaView,
               runsView,
@@ -18,4 +18,4 @@ blueprints = [homeView,
               challengesView,
               statisticsView,
               profileView,
-              ]
+             ]
