@@ -262,8 +262,8 @@ td.empty {
 
 .plot {
   margin: 10px;
-  max-width: 400px;
-  max-height: 400px;
+  width: 400px;
+  height: 400px;
 }
 
 ::-webkit-scrollbar {
