@@ -1,7 +1,11 @@
+import os
 from apigateway.apigateway.database import db
 import pytest
 from unittest.mock import patch
 import functools
+
+DB_PATH = '/tmp/apigateway.apigateway_test.db'
+DB_URI = 'sqlite:////tmp/apigateway.apigateway_test.db'
 
 
 def login_required(func):
@@ -17,9 +21,11 @@ def app():
     from apigateway.apigateway.app import create_app
     app = create_app()
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/apigateway.apigateway_test.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 
     yield app
+    if os.path.exists(DB_PATH):
+        os.unlink(DB_PATH)
 
 
 @pytest.fixture
@@ -28,10 +34,11 @@ def app_login_required():
     app = create_app()
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/apigateway.apigateway_test.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
 
     yield app
-    # os.unlink('/tmp/apigateway.apigateway_test.db')
+    if os.path.exists(DB_PATH):
+        os.unlink(DB_PATH)
 
 
 @pytest.fixture
