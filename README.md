@@ -1,1 +1,1 @@
-# BeepBeep-API-gateway
+# BeepBeep-API-gateway [![Build Status](https://travis-ci.org/MFranceschi6/BeepBeep-API-gateway.svg?branch=master)](https://travis-ci.org/MFranceschi6/BeepBeep-API-gateway) [![Coverage Status](https://coveralls.io/repos/github/MFranceschi6/BeepBeep-API-gateway/badge.svg?branch=master)](https://coveralls.io/github/MFranceschi6/BeepBeep-API-gateway?branch=master)
