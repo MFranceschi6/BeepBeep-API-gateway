@@ -1,21 +1,21 @@
-from .home import home
+from .home import home as _home
 from .auth import auth as _auth
-from .users import users
-from .strava import strava
-from .runs import runs
-from .training_objectives import training_objectives
-from .challenges import challenges
-from .statistics import statistics
-from .profile import profile
+from .users import users as _users
+from .strava import strava as _strava
+from .runs import runs as _runs
+from .training_objectives import training_objectives as _training_objectives
+from .challenges import challenges as _challenges
+from .statistics import statistics as _statistics
+from .profile import profile as _profile
 
 
-blueprints = [home,
+blueprints = [_home,
               _auth,
-              users,
-              strava,
-              runs,
-              training_objectives,
-              challenges,
-              statistics,
-              profile,
+              _users,
+              _strava,
+              _runs,
+              _training_objectives,
+              _challenges,
+              _statistics,
+              _profile,
               ]
