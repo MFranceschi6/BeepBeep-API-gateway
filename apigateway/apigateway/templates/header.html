@@ -1,6 +1,7 @@
 <head>
   <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
   <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+  <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
 </head>
 <body>
   <ul class="navbar">
@@ -9,6 +10,8 @@
     
     {% if current_user.is_authenticated %}
       <li><a href="{{url_for('challenges._challenges')}}">Challenges</a></li>
+      <li><a href="{{url_for('statistics._statistics')}}">Statistics</a></li>
+      <li><a href="{{url_for('training_objectives._training_objectives')}}">Training Objectives</a></li>
       <li class="float-right"><a href="{{url_for('auth.logout')}}">Logout</a></li>
       {% if not current_user.is_strava_authorized %}
         <li class="float-right"><a href="{{strava_auth_url}}">Authorize Strava Access</a></li>
