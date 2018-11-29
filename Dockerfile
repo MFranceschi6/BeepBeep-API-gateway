@@ -1,4 +1,4 @@
-FROM python
+FROM python:3.6.7-jessie
 MAINTAINER "Butter Group"
 EXPOSE 5000
 ADD requirements.txt ./app/
