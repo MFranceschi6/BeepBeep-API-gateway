@@ -1,29 +1,76 @@
-from unittest import mock
-from apigateway.apigateway.database import User
-import pytest
 import datetime
+import requests
+from unittest import mock
+from werkzeug.exceptions import HTTPException
 
-def make_and_login_user(client, db_instance):
-    response = client.post('/create_user', follow_redirects=True, data=dict(
-        submit='Publish',
-        email='test@email.com',
-        firstname='1',
-        lastname='1',
-        password='1',
-        age='1',
-        weight='1',
-        max_hr='1',
-        rest_hr='1',
-        vo2max='1'))
+AUTH = 'apigateway.apigateway.auth'
+CHALLENGES = 'apigateway.apigateway.views.challenges'
 
-    assert response.status_code == 200
-    print(response.data.decode('ascii'))
-    assert b'> Please Login or Register </' in response.data
 
-    response = client.post('/login', follow_redirects=True, data=dict(email='test@email.com', password='1'))
-    assert response.status_code == 200
-    print(response.data.decode('ascii'))
-    assert b'>Hi test@email.com </' in response.data
+def test_challenges(client, db_instance):
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.get_request_retry') as mocked:
+            mocked.return_value.status_code = 200    
+            result = client.get('/challenges')
 
-def test_one():
-    assert 2==2
+            print(result.json)
+            assert result.status_code == 200
+
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.get_request_retry') as mocked:
+            mocked.return_value.status_code = 404
+            result = client.get('/challenges')
+
+            print(result.json)
+            assert result.status_code == 404
+
+def test_challenge_create(client, db_instance):
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.post_request_retry') as mocked:
+            mocked.return_value.status_code = 200
+            result = client.get('/challenges/1')
+
+            print(result.json)
+            assert result.status_code == 302
+    
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.post_request_retry') as mocked:
+            mocked.return_value.status_code = 404
+            result = client.get('/challenges/1')
+
+            print(result.json)
+            assert result.status_code == 404
+
+def test_challenge_complete(client, db_instance):
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.put_request_retry') as mocked:
+            mocked.return_value.status_code = 200
+            result = client.get('/challenges/1/complete/1')
+            assert result.status_code == 302
+
+    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+        current_user_mock.id = 1
+        with mock.patch(CHALLENGES + '.put_request_retry') as mocked:
+            mocked.return_value.status_code = 404
+            result = client.get('/challenges/1/complete/1')
+            assert result.status_code == 404
+
+#def test_challenge(client, db_instance):
+#    with mock.patch(CHALLENGES + '.current_user') as current_user_mock:
+#        current_user_mock.id = 1
+#        with mock.patch(CHALLENGES + '.get_request_retry') as mocked:
+#            mocked.return_value.status_code = 200
+#            with mock.patch(CHALLENGES + '.get_request_retry') as mocked_run:
+#                mocked_run.return_value.status_code = 200
+#                mocked_run.return_value.json.return_value = 1
+#                result = client.get('/challenges/1/complete/1')
+#                assert result.status_code == 302
+#
+#def test_timestamp_to_date(client, db_instance):
+#    assert timestamp_to_date(1541030400) == '11/01/2018 at 12:00'
+#
