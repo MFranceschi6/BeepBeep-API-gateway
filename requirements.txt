@@ -1,0 +1,10 @@
+pyjwt
+-e git+https://github.com/MFranceschi6/flakon.git#egg=flakon
+flask
+flask-login
+flask-wtf
+flask_sqlalchemy
+stravalib==0.9.4
+chaussette
+celery
+redis

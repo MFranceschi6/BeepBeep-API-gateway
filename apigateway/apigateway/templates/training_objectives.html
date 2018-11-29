@@ -1,0 +1,85 @@
+<html>
+{% include 'header.html' %}
+  
+  <div class="content">
+
+    <h1 class="text-center textPumpkingDark">Set a training objective</h1>
+    <form action="" method="POST">
+      <table>
+        {{ setter_form.hidden_tag() }}
+        <thead>
+          <tr>
+            {% for field in setter_form.display %}
+              <th>{{ setter_form[field].label }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            {% for field in setter_form.display %}
+              <td  class="text-center" style="vertical-align: top;">
+                {{ setter_form[field]() }}
+                {% if setter_form[field].errors %}
+                  {% for e in setter_form[field].errors %}
+                    <p class="help-block">{{ e }}</p>
+                  {% endfor %}
+                {% endif %}
+              </td>
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-center">
+          <button class="buttonSlim buttonJeans" type=submit>Create</button>
+          <button class="buttonSlim buttonJeans" type=reset>Reset</button>
+      </p>
+    </form>
+
+    {% if training_objectives_list|length > 0 %}
+      <h1 class="text-center textPumpkingDark">Training Objectives</h1>
+      <table>
+        <thead>
+          <tr>
+            {% for field in visualizer_form.display %}
+              <th>{{ visualizer_form[field].label }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for to in training_objectives_list %}
+          <tr>
+            <td class="text-center">{{ to['start_date'] }}</td>
+            <td class="text-center">{{ to['end_date'] }}</td>
+            <td class="text-center">{{ to['kilometers_to_run'] }}</td>
+            <td class="text-center">{{ to['travelled_kilometers'] }}</td>
+            <!--completed-->
+            {% if to['travelled_kilometers'] >= to['kilometers_to_run'] %}
+              <td class="text-center">>
+                <img class="icon" src="{{url_for('static', filename='check.png')}}"/>
+              </td>
+              <td>Wow! You are done!</td>
+            {% else %}
+              <!--active-->
+              {% if to['is_expired'] == false %}
+                <td class="text-center">
+                  <img class="icon" src="{{url_for('static', filename='circle.png')}}"/>
+                </td>
+                <td>You can do it! Just {{ to['km_left'] }} km!</td>
+              <!--failed-->
+              {% else %}
+                <td class="text-center">
+                  <img class="icon" src="{{url_for('static', filename='cross.png')}}"/>
+                </td>
+                <td>You missed your goal by {{ to['km_left'] }} km...</td>
+              {% endif %}
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+  </div>
+
+{% include 'footer.html' %}
+</html>

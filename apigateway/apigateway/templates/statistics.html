@@ -1,0 +1,145 @@
+<html>
+{% include 'header.html' %}
+
+  <div class="content">
+    {% if current_user.is_authenticated %}
+      <h1 class="textJeansDark text-center">Statistics of your Runs</h1>
+
+      {% if run_names|length == 0 %}
+          <h1 class="textPumpkingDark text-center">Resources requested are not available!</h1>
+          <p class="textPumpkingDark text-center">Try again when you have actually registered a run or have linked your Strava account!</p>
+      {% else %}
+
+      <div style="width: 90vw">
+        <div id="row">
+            {% if distances is not none %}
+              <div class="items">
+                <div id="distancePlot" class="plot"></div>
+              </div>
+            {% endif %}
+            {% if average_speeds is not none %}
+              <div class="items">
+                <div id="avgSpeedPlot" class="plot"></div>
+              </div>
+            {% endif %}
+            {% if average_heart_rates is not none %}
+              <div class="items">
+                <div id="avgHeartRatePlot" class="plot"></div>
+              </div>
+            {% endif %}
+            {% if elevation_gains is not none %}
+              <div class="items">
+                <div id="elevationGainPlot" class="plot"></div>
+              </div>
+            {% endif %}
+            {% if elapsed_times is not none %}
+              <div class="items">
+                <div id="elapsedTimePlot" class="plot"></div>
+              </div>
+            {% endif %}
+        </div>
+      </div>
+
+      <script>
+        var run_names_fixed = []
+
+        {% for run_name in run_names %}
+            run_names_fixed.push("{{ run_name }}");
+        {%  endfor %}
+
+
+        {% if distances is not none %}
+          var layout_distance = {
+            title: 'Distance for your runs',
+            xaxis: { title: 'Run Names', tickangle: -45 },
+            yaxis: { title: 'Distance' }
+          };
+
+          var distance_plot = [{
+            x: run_names_fixed,
+            y: {{ distances }},
+            type: 'bar'
+          }];
+
+          Plotly.newPlot('distancePlot', distance_plot, layout_distance);
+        {% endif %}
+
+
+        {% if average_speeds is not none %}
+          var layout_avg_speed = {
+            title: 'Average Speed for your runs',
+            xaxis: { title: 'Run Names', tickangle: -45 },
+            yaxis: { title: 'Average Speed'}
+          };
+
+          var avg_speed_plot = [{
+            x: run_names_fixed,
+            y: {{ average_speeds }},
+            type: 'bar'
+          }];
+
+          Plotly.newPlot('avgSpeedPlot', avg_speed_plot, layout_avg_speed);
+
+        {% endif %}
+
+
+        {% if average_heart_rates is not none %}
+          var layout_avg_heart_rate = {
+            title: 'Average Heart Rate for your runs',
+            xaxis: { title: 'Run Names', tickangle: -45 },
+            yaxis: { title: 'Average Heart Rate' }
+          };
+
+
+          var avg_heart_rate_plot = [{
+            x: run_names_fixed,
+            y: {{ average_heart_rates }},
+            type: 'bar'
+          }];
+
+          Plotly.newPlot('avgHeartRatePlot', avg_heart_rate_plot, layout_avg_heart_rate);
+        {% endif %}
+
+
+        {% if elevation_gains is not none %}
+          var layout_elevation_gain = {
+            title: 'Elevation Gain for your runs',
+            xaxis: { title: 'Run Names', tickangle: -45},
+            yaxis: { title: 'Elevation Gain' }
+          };
+
+          var elevation_gain_plot = [{
+            x: run_names_fixed,
+            y: {{ elevation_gains }},
+            type: 'bar'
+          }];
+
+          Plotly.newPlot('elevationGainPlot', elevation_gain_plot, layout_elevation_gain);
+        {% endif %}
+
+
+        {% if elapsed_times is not none %}
+          var layout_elapsed_time = {
+            title: 'Elapsed Time for your runs',
+            xaxis: { title: 'Run Names', tickangle: -45 },
+            yaxis: { title: 'Elapsed Time' }
+          };
+
+          var elapsed_time_plot = [{
+            x: run_names_fixed,
+            y: {{ elapsed_times }},
+            type: 'bar'
+          }];
+          Plotly.newPlot('elapsedTimePlot', elapsed_time_plot, layout_elapsed_time);
+        {% endif %}
+
+
+      </script>
+      
+      {% endif %}
+    {% else %}
+      <h1> You need to be logged in to view your Statistics!</h1>
+    {% endif %}
+  </div>
+  {% include 'footer.html' %}
+</html>
