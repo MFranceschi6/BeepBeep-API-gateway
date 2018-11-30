@@ -135,6 +135,7 @@ def challenge(id):
                     code = r.status_code
                     if code == 200:
                         runs = r.json()
+                        print(runs)
 
                         for run in runs:
                             date = run['start_date']
@@ -157,8 +158,6 @@ def challenge(id):
         print(err)
         return abort(503)
 
-    return abort(400)
-
 
 @challenges.route('/challenges/<id>/complete/<challenger_id>',
                   methods=['GET'])
@@ -180,4 +179,3 @@ def challenge_complete(id, challenger_id):
     except requests.exceptions.RequestException as err:
         print(err)
         return abort(503)
-    return abort(400)

@@ -83,5 +83,3 @@ def _profile():
     except requests.exceptions.RequestException as err:
         print(err)
         return abort(503)
-
-    return abort(400)
