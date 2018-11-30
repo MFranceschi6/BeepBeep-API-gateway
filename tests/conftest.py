@@ -18,6 +18,7 @@ def login_required(func):
 @pytest.fixture
 def app():
     patch('apigateway.apigateway.auth.login_required', login_required).start()
+    patch('apigateway.apigateway.auth.strava_token_required', lambda x: x).start()
     from apigateway.apigateway.app import create_app
     app = create_app()
     app.config['TESTING'] = True

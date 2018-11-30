@@ -18,6 +18,7 @@ celery_app = Celery(__name__, backend=BACKEND, broker=BROKER)
 @login_required
 def fetch_new_runs():
     user_id = current_user.id
+    print(celery_app)
     result = celery_app.send_task('datapump.datapump.fetch_runs_for_user',
                                   args=[user_id],
                                   queue="fetch")
